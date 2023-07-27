@@ -65,7 +65,7 @@ def base_dmg(base_dmg,crit,crit_dmg,weight_class="medium",thwarting=False,attune
         if random.randint(1,100) <= pyromania_chance:
             base_dmg_bonus+=10
     if invig_punishment:
-        base_dmg_bonus += random.randint(0,32) // 2 # only even amounts
+        base_dmg_bonus += random.randint(0,32) // 4 # only even amounts
     if aversion:
         base_dmg_bonus -= 3.9*aversion_amt
     if crit: 
@@ -192,9 +192,9 @@ def calc_dmg(nw_class,amt_resil_ui=0,amt_shirking_ui=0,amt_aversion_ui=0):
         return [round(damage),base_dmg_out,crit_out,crit_dmg_out,empower_percentage_out,dmg_absorbed_out,fort_percentage_out]
     
     elif nw_class == "light_fs_vicious_fire_damage":
-        crit_out = crit(base_crit=10,spellslinger=True)
+        crit_out = crit(base_crit=10,spellslinger=True,keen_awareness=False)
         crit_dmg_out = crit_dmg(crit_dmg=35,int_50=True,con_150=True,bonus_crit_dmg=12,prophet_of_a_fire_god=True,amt_resil=amt_resil_ui) # includes vicious
-        base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="light",int_300=True,aversion=True,aversion_amt=amt_aversion_ui,attunement=True,int_150=True)
+        base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="light",int_300=True,aversion=True,aversion_amt=amt_aversion_ui,attunement=True,int_150=True,invig_punishment=True)
         empower_percentage_out = empower_percentage(keenly_empowered=True,clear_casting=True,clear_mind=True,dmg_ring=True)
         dmg_absorbed_out = dmg_absorbed(15)
         fort_percentage_out = fort_percentage(target_weight="medium",shirking=True,shirking_amount=amt_shirking_ui,fort_amt=random.randint(-50,50),con_200=True)
@@ -203,8 +203,8 @@ def calc_dmg(nw_class,amt_resil_ui=0,amt_shirking_ui=0,amt_aversion_ui=0):
         
         return [round(damage),base_dmg_out,crit_out,crit_dmg_out,empower_percentage_out,dmg_absorbed_out,fort_percentage_out]
     
-    elif nw_class == "light_fs_vicious_invig_punishment":
-        crit_out = crit(base_crit=10,spellslinger=True)
+    elif nw_class == "light_fs_vicious_keen":
+        crit_out = crit(base_crit=10,spellslinger=True,keen_awareness=True)
         crit_dmg_out = crit_dmg(crit_dmg=35,int_50=True,con_150=True,bonus_crit_dmg=12,prophet_of_a_fire_god=True,amt_resil=amt_resil_ui) # includes vicious
         base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="light",int_300=True,aversion=True,aversion_amt=amt_aversion_ui,attunement=True,int_150=True,invig_punishment=True)
         empower_percentage_out = empower_percentage(keenly_empowered=True,clear_casting=True,clear_mind=True,dmg_ring=False)
@@ -215,5 +215,16 @@ def calc_dmg(nw_class,amt_resil_ui=0,amt_shirking_ui=0,amt_aversion_ui=0):
         
         return [round(damage),base_dmg_out,crit_out,crit_dmg_out,empower_percentage_out,dmg_absorbed_out,fort_percentage_out]
 
+    elif nw_class == "light_fs_vicious_keen_dmg":
+        crit_out = crit(base_crit=10,spellslinger=True,keen_awareness=True)
+        crit_dmg_out = crit_dmg(crit_dmg=35,int_50=True,con_150=True,bonus_crit_dmg=12,prophet_of_a_fire_god=True,amt_resil=amt_resil_ui) # includes vicious
+        base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="light",int_300=True,aversion=True,aversion_amt=amt_aversion_ui,attunement=True,int_150=True,invig_punishment=False)
+        empower_percentage_out = empower_percentage(keenly_empowered=True,clear_casting=True,clear_mind=True,dmg_ring=False)
+        dmg_absorbed_out = dmg_absorbed(15)
+        fort_percentage_out = fort_percentage(target_weight="medium",shirking=True,shirking_amount=amt_shirking_ui,fort_amt=random.randint(-50,50),con_200=True)
+
+        damage = base_dmg_out * empower_percentage_out * dmg_absorbed_out * fort_percentage_out
+        
+        return [round(damage),base_dmg_out,crit_out,crit_dmg_out,empower_percentage_out,dmg_absorbed_out,fort_percentage_out]
 # calc_dmg("light_fs")
 # calc_dmg("med_bruiser_ga")
