@@ -34,7 +34,7 @@ def crit(base_crit,extra_crit=0,backstab_percent=0,keen=False,keen_awareness=Fal
 
 def base_dmg(base_dmg,crit,crit_dmg,weight_class="medium",thwarting=False,attunement=False,shirking=False,shirking_percent=20,str_200=False,str_50=False,str_100=False,
              auto_percent=90,int_150=False,int_300=False,base_dmg_bonus=0,opal=True,opal_percentage=75,aversion=False,aversion_amt=5,
-             pyromania=False,pyromania_chance=25,dmg_ring=False):
+             pyromania=False,pyromania_chance=25,invig_punishment=True):
     
     weight_class_base_dmg = {
         "light": 20,
@@ -64,8 +64,8 @@ def base_dmg(base_dmg,crit,crit_dmg,weight_class="medium",thwarting=False,attune
     if pyromania:
         if random.randint(1,100) <= pyromania_chance:
             base_dmg_bonus+=10
-    if dmg_ring:
-        base_dmg_bonus += 4.9
+    if invig_punishment:
+        base_dmg_bonus += random.randint(0,32) // 2 # only even amounts
     if aversion:
         base_dmg_bonus -= 3.9*aversion_amt
     if crit: 
@@ -77,7 +77,7 @@ def base_dmg(base_dmg,crit,crit_dmg,weight_class="medium",thwarting=False,attune
 def empower_percentage(bonus_empower=0,keenly_empowered=False,shirking_empower=False,avg_shirking_empower_stacks=3,greed=False,
                        avg_greed_stacks=1.33,center_of_attention=False,center_of_attention_percentage=20,power_through_pain=False,
                        power_through_pain_percentage=75,hammer_time=False,hammer_time_percentage=25,clear_casting=False,clear_casting_percentage=80,
-                       clear_mind=False,clear_mind_percentage=50):
+                       clear_mind=False,clear_mind_percentage=50,dmg_ring=False):
     if keenly_empowered:
         bonus_empower +=15
     if shirking_empower:
@@ -99,6 +99,8 @@ def empower_percentage(bonus_empower=0,keenly_empowered=False,shirking_empower=F
     if clear_mind:
         if random.randint(1,100) <= clear_mind_percentage:
             bonus_empower +=5
+    if dmg_ring:
+        bonus_empower += 4.9
     bonus_empower -= random.randint(0,30) # random weakens
     
     if bonus_empower > 50:
@@ -192,8 +194,20 @@ def calc_dmg(nw_class,amt_resil_ui=0,amt_shirking_ui=0,amt_aversion_ui=0):
     elif nw_class == "light_fs_vicious_fire_damage":
         crit_out = crit(base_crit=10,spellslinger=True)
         crit_dmg_out = crit_dmg(crit_dmg=35,int_50=True,con_150=True,bonus_crit_dmg=12,prophet_of_a_fire_god=True,amt_resil=amt_resil_ui) # includes vicious
-        base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="light",int_300=True,aversion=True,aversion_amt=amt_aversion_ui,attunement=True,int_150=True,dmg_ring=True)
-        empower_percentage_out = empower_percentage(keenly_empowered=True,clear_casting=True,clear_mind=True)
+        base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="light",int_300=True,aversion=True,aversion_amt=amt_aversion_ui,attunement=True,int_150=True)
+        empower_percentage_out = empower_percentage(keenly_empowered=True,clear_casting=True,clear_mind=True,dmg_ring=True)
+        dmg_absorbed_out = dmg_absorbed(15)
+        fort_percentage_out = fort_percentage(target_weight="medium",shirking=True,shirking_amount=amt_shirking_ui,fort_amt=random.randint(-50,50),con_200=True)
+
+        damage = base_dmg_out * empower_percentage_out * dmg_absorbed_out * fort_percentage_out
+        
+        return [round(damage),base_dmg_out,crit_out,crit_dmg_out,empower_percentage_out,dmg_absorbed_out,fort_percentage_out]
+    
+    elif nw_class == "light_fs_vicious_invig_punishment":
+        crit_out = crit(base_crit=10,spellslinger=True)
+        crit_dmg_out = crit_dmg(crit_dmg=35,int_50=True,con_150=True,bonus_crit_dmg=12,prophet_of_a_fire_god=True,amt_resil=amt_resil_ui) # includes vicious
+        base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="light",int_300=True,aversion=True,aversion_amt=amt_aversion_ui,attunement=True,int_150=True,invig_punishment=True)
+        empower_percentage_out = empower_percentage(keenly_empowered=True,clear_casting=True,clear_mind=True,dmg_ring=False)
         dmg_absorbed_out = dmg_absorbed(15)
         fort_percentage_out = fort_percentage(target_weight="medium",shirking=True,shirking_amount=amt_shirking_ui,fort_amt=random.randint(-50,50),con_200=True)
 
