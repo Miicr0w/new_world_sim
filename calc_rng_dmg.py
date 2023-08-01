@@ -101,7 +101,7 @@ def empower_percentage(bonus_empower=0,keenly_empowered=False,shirking_empower=F
             bonus_empower +=5
     if dmg_ring:
         bonus_empower += 4.9
-    bonus_empower -= random.randint(0,30) # random weakens
+    bonus_empower -= random.randint(0,40) # random weakens
     
     if bonus_empower > 50:
         return 1.5
@@ -154,12 +154,24 @@ def calc_dmg(nw_class,amt_resil_ui=0,amt_shirking_ui=0,amt_aversion_ui=0):
         damage = base_dmg_out * empower_percentage_out * dmg_absorbed_out * fort_percentage_out
 
         return [round(damage),base_dmg_out,crit_out,crit_dmg_out,empower_percentage_out,dmg_absorbed_out,fort_percentage_out]
-    
+
+    if nw_class == "med_bruiser_ga_emp":
+        crit_out = crit(base_crit=7,backstab_percent=22.5,keen_awareness=True)
+        crit_dmg_out = crit_dmg(crit_dmg=30,con_150=True,bonus_crit_dmg=10,amt_resil=amt_resil_ui)
+        base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="medium",aversion=False,thwarting=True,attunement=True,str_50=True,str_100=True,str_200=True)
+        empower_percentage_out = empower_percentage(keenly_empowered=False,greed=True,center_of_attention=True,shirking_empower=True)
+        dmg_absorbed_out = dmg_absorbed(15)
+        fort_percentage_out = fort_percentage(target_weight="medium",shirking=True,shirking_amount=amt_shirking_ui,fort_amt=random.randint(-50,50),con_200=True)
+
+        damage = base_dmg_out * empower_percentage_out * dmg_absorbed_out * fort_percentage_out
+
+        return [round(damage),base_dmg_out,crit_out,crit_dmg_out,empower_percentage_out,dmg_absorbed_out,fort_percentage_out]
+
     elif nw_class == "med_bruiser_wh_shirk":
         crit_out = crit(base_crit=7,backstab_percent=35,keen_awareness=True)
         crit_dmg_out = crit_dmg(crit_dmg=20,con_150=True,bonus_crit_dmg=0,amt_resil=amt_resil_ui)
         base_dmg_out = base_dmg(1250,crit=crit_out,crit_dmg=crit_dmg_out,weight_class="medium",aversion=False,thwarting=True,shirking=True,str_50=True,str_100=True,str_200=True)
-        empower_percentage_out = empower_percentage(keenly_empowered=False,power_through_pain=True)
+        empower_percentage_out = empower_percentage(keenly_empowered=False,power_through_pain=True,shirking_empower=True)
         dmg_absorbed_out = dmg_absorbed(5)
         fort_percentage_out = fort_percentage(target_weight="medium",shirking=True,shirking_amount=amt_shirking_ui,fort_amt=random.randint(-50,50),con_200=True)
 
